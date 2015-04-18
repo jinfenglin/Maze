@@ -47,7 +47,7 @@ class Maze
 	def trace(begx,begy,endy,endx)
 		return @av.trace(begy,begx,endy,endx,@map)
 	end
-
+	#check a location is vaild and undected
 	def redesign()
 	end
 end
@@ -58,40 +58,6 @@ class Advanturer
 		@y_length=y_length
 		@x_length=x_length
 		@trace=[]
-	end
-	def check_south(point)
-		y,x=point.position
-		if y+1<@y_length and @map[y+1][x].undected?
-			return true
-		else 
-			return false
-		end
-	end
-	
-	def check_north(point)
-		y,x=point.position
-		if y-1>=0 and @map[y-1][x].undected?
-			return true
-		else 
-			return false
-		end
-	end
-	def check_east(point)
-		y,x=point.position
-		if x+1<@x_length and @map[y][x+1].undected?
-			return true
-		else
-			return false
-		end
-	end
-	def check_west(point)
-		y,x=point.position
-		if x-1>=0 and @map[y][x-1].undected?
-			return true
-		else
-			return false
-		end
-
 	end
 	#refract here !!!
 	def solve(begy,begx,endy,endx,map)
@@ -109,6 +75,21 @@ class Advanturer
 		return @trace
 
 	end
+	def check_location(y,x)		
+		if (0..@y_length-1).include?(y) and (0..@x_length-1).include?(x) and @map[y][x].undected?
+			return true
+		else
+			return false
+		end
+	end
+	def get_point(y,x)
+		if check_location(y,x)
+			return @map[y][x]
+		else
+			return nil
+		end
+	end
+
 
 	def DFS(current_point,target_point,path)
 		if current_point.eq(target_point)
@@ -117,46 +98,22 @@ class Advanturer
 			return 'found'
 		end
 		
-		current_y,current_x=current_point.position
-		target_y,target_x=target_point.position
-		current_point.detect_it		
-
-		
-		#if current_y+1<@y_length and @map[current_y+1][current_x].undected?
-		if check_south(current_point)
-			puts "##"			
-			path.push current_point
-			next_point=  @map[current_y+1][current_x]		
-			flag=DFS(next_point,target_point,path)
-			if flag=='found'
-				return flag
-			end
-		end
-		if check_north(current_point)
-			path.push current_point
-			next_point= @map[current_y-1][current_x]
-			flag=DFS(next_point,target_point,path)
-			if flag=='found'
-				return flag
-			end
-		end
-		if check_east(current_point)
-			path.push current_point
-			next_point=@map[current_y][current_x+1]
-			flag=DFS(next_point,target_point,path)
-			if flag=='found'
-				return flag
-			end
-		end
-		if check_west(current_point)
-			path.push current_point
-			next_point=@map[current_y][current_x-1]
-			flag=DFS(next_point,target_point,path)
-			if flag=='found'
-				return flag
-			end
+		try_array=[]
+		current_point.directions.each do |direction|
+			y,x=direction.call
+			candidate=get_point(y,x)
+			try_array.push candidate
 		end
 
+		current_point.detect_it	
+		try_array.compact!
+		try_array.each do |next_point|	
+			path.push current_point
+			flag=DFS(next_point,target_point,path)
+			if flag=='found'
+				return flag
+			end
+		end
 	end
 
 end
@@ -166,6 +123,7 @@ class Point
 	attr_accessor :x
 	attr_accessor :y
 	attr_accessor :state
+	attr_accessor :directions
 	def eq(pt)
 		if(pt.x==@x and pt.y==@y and pt.state=@state)
 			return true
@@ -177,6 +135,7 @@ class Point
 		@state=state
 		@x=x
 		@y=y
+		@directions=[method(:north),method(:south),method(:east),method(:west)]
 	end
 	#return the point x,y
 	def position 
@@ -196,6 +155,18 @@ class Point
 		puts "(#{@y},#{@x})"
        	end
 
+	def north
+		return y-1,x
+	end
+	def south
+		return y+1,x
+	end
+	def east
+		return y,x+1
+	end
+	def west
+		return y,x-1
+	end
 
 	def detect_it
 		if @state=='undetected'
