@@ -59,7 +59,40 @@ class Advanturer
 		@x_length=x_length
 		@trace=[]
 	end
+	def check_south(point)
+		y,x=point.position
+		if y+1<@y_length and @map[y+1][x].undected?
+			return true
+		else 
+			return false
+		end
+	end
+	
+	def check_north(point)
+		y,x=point.position
+		if y-1>=0 and @map[y-1][x].undected?
+			return true
+		else 
+			return false
+		end
+	end
+	def check_east(point)
+		y,x=point.position
+		if x+1<@x_length and @map[y][x+1].undected?
+			return true
+		else
+			return false
+		end
+	end
+	def check_west(point)
+		y,x=point.position
+		if x-1>=0 and @map[y][x-1].undected?
+			return true
+		else
+			return false
+		end
 
+	end
 	#refract here !!!
 	def solve(begy,begx,endy,endx,map)
 		start_point=map[begy][begx]
@@ -79,26 +112,19 @@ class Advanturer
 
 	def DFS(current_point,target_point,path)
 		if current_point.eq(target_point)
-		#	puts 'I am here'
 			path.push current_point
 			@trace=path			
 			return 'found'
 		end
 		
-		current_y=current_point.y
-		current_x=current_point.x
+		current_y,current_x=current_point.position
+		target_y,target_x=target_point.position
+		current_point.detect_it		
 
-		target_y=target_point.y
-		target_x=target_point.x
-
-
-		puts "now at #{current_y},#{current_x}"
-		puts "target at #{target_y},#{target_x}"
-
-		current_point.detect_it
 		
-
-		if current_y+1<@y_length and @map[current_y+1][current_x].undected?
+		#if current_y+1<@y_length and @map[current_y+1][current_x].undected?
+		if check_south(current_point)
+			puts "##"			
 			path.push current_point
 			next_point=  @map[current_y+1][current_x]		
 			flag=DFS(next_point,target_point,path)
@@ -106,7 +132,7 @@ class Advanturer
 				return flag
 			end
 		end
-		if current_y-1>=0 and @map[current_y-1][current_x].undected?
+		if check_north(current_point)
 			path.push current_point
 			next_point= @map[current_y-1][current_x]
 			flag=DFS(next_point,target_point,path)
@@ -114,7 +140,7 @@ class Advanturer
 				return flag
 			end
 		end
-		if current_x+1<@x_length and @map[current_y][current_x+1].undected?
+		if check_east(current_point)
 			path.push current_point
 			next_point=@map[current_y][current_x+1]
 			flag=DFS(next_point,target_point,path)
@@ -122,7 +148,7 @@ class Advanturer
 				return flag
 			end
 		end
-		if current_x-1>=0 and @map[current_y][current_x-1].undected?
+		if check_west(current_point)
 			path.push current_point
 			next_point=@map[current_y][current_x-1]
 			flag=DFS(next_point,target_point,path)
@@ -151,6 +177,10 @@ class Point
 		@state=state
 		@x=x
 		@y=y
+	end
+	#return the point x,y
+	def position 
+		return @y,@x
 	end
 	def wall?
 		return @state == 'wall'

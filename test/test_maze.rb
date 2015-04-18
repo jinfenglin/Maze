@@ -10,7 +10,7 @@ describe Maze do
 		arg="11111101011000111100"
 		@mz=Maze.new(5,4)
 		@mz.load(arg)
-		@mz.display	
+		#@mz.display	
 		puts @mz.solve(1,1,3,4)
 		(@mz.trace(1,1,3,4)).each do |point|
 			puts point.to_str
