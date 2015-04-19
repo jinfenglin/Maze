@@ -61,22 +61,6 @@ class MazeGenerator
 		@map=[]
 		reset()
 	end
-	
-	def display
-		(0..@y_length-1).each do |y_counter|
-			(0..@x_length-1).each do |x_counter|
-				pt=@map[y_counter][x_counter]
-				if pt.wall?
-					print '1'
-				else
-					print '0'
-				end 
-			end
-			puts ""
-		end
-		STDOUT.flush
-	end
-
 	def reset()
 		(0..@y_length).each do |y|
 			temp_array=[]
@@ -104,28 +88,16 @@ class MazeGenerator
 		y,x=split_point.position
 		y_north_bound,x_north_bound = north_corner.position
 		y_south_bound,x_south_bound = south_corner.position
-		hole_num=1
-		
-		(x_north_bound..x_south_bound).each do |iter_x|			
+		(x_north_bound..x_south_bound).zip(y_north_bound..y_south_bound) { |iter_x,iter_y|
 			@map[y][iter_x].set_wall
-		end
-		(y_north_bound..y_south_bound).each do |iter_y|
 			@map[iter_y][x].set_wall
-		end
-		num=rand(1..4)
-		if (num!= 1)
-		
-			drill_at_vertical(y_north_bound+1,y-1,x)
-		end
-		if (num!=2)
-			drill_at_vertical(y+1,y_south_bound-1,x)
-		end
-		if (num!=3)
-			drill_at_horizontal(x_north_bound+1,x-1,y)
-		end
-		if (num!=4)
-			drill_at_horizontal(x+1,x_south_bound-1,y)
-		end
+		}
+
+		#Drill 3 holes on the wall
+		drill_at_vertical(y_north_bound+1,y-1,x)
+		drill_at_vertical(y+1,y_south_bound-1,x)
+		drill_at_horizontal(x_north_bound+1,x-1,y)
+		drill_at_horizontal(x+1,x_south_bound-1,y)
 	end
 	
 	#North
@@ -144,11 +116,7 @@ class MazeGenerator
 			puts "sp point null:(#{n_y+2},#{s_y-2}):(#{n_x+2},#{s_x-2})"
 			return @map
 		end
-		puts "split point:#{split_point.to_str}"
 		generate_walls(split_point,north_west_corner,south_east_corner)
-		puts "bound:(#{n_y},#{n_x}):(#{s_y},#{s_x})"
-		display
-
 		sp_y,sp_x=split_point.position
 		north_east_corner=Point.new(n_y,s_x,'wall')
 		south_west_corner=Point.new(s_y,n_x,'wall')
@@ -158,7 +126,6 @@ class MazeGenerator
 		east_middle=Point.new(sp_y,s_x,'wall')
 
 		generate(north_west_corner,split_point)
-		puts "second time"
 		generate(north_middle,east_middle)
 		generate(west_middle,south_middle)
 		generate(split_point,south_east_corner)		
