@@ -100,10 +100,10 @@ class MazeGenerator
 		drill_at_horizontal(x+1,x_south_bound-1,y)
 	end
 	
-	#North
+	# North Middle
 	#*----*----*
 	#|    |    |
-	#|----sp---|	   
+	#|----sp---* East Middle	   
 	#|    |	   |
 	#|    |	   |
 	#*----*----*
@@ -113,22 +113,28 @@ class MazeGenerator
 		s_y,s_x=south_east_corner.position
 		split_point=Point.new(rand(n_y+2..s_y-2),rand(n_x+2..s_x-2),'wall')
 		if(split_point.x==nil or split_point.y==nil)
-			puts "sp point null:(#{n_y+2},#{s_y-2}):(#{n_x+2},#{s_x-2})"
 			return @map
 		end
 		generate_walls(split_point,north_west_corner,south_east_corner)
-		sp_y,sp_x=split_point.position
-		north_east_corner=Point.new(n_y,s_x,'wall')
-		south_west_corner=Point.new(s_y,n_x,'wall')
+	
+		north_middle,west_middle,south_middle,east_middle=middle_points(north_west_corner,south_east_corner,split_point)
+       	       	generate(north_west_corner,split_point)
+		generate(north_middle,east_middle)
+		generate(west_middle,south_middle)
+		generate(split_point,south_east_corner)		
+	end
+
+	#generate middle points depending on the given 3 points
+	def middle_points(north_west_corner,south_east_corner,split_point)
+		n_y,n_x=north_west_corner.position
+		s_y,s_x=south_east_corner.position
+		sp_y,sp_x=split_point.position	
+
 		north_middle=Point.new(n_y,sp_x,'wall')
 		south_middle=Point.new(s_y,sp_x,'wall')
 		west_middle=Point.new(sp_y,n_x,'wall')
 		east_middle=Point.new(sp_y,s_x,'wall')
-
-		generate(north_west_corner,split_point)
-		generate(north_middle,east_middle)
-		generate(west_middle,south_middle)
-		generate(split_point,south_east_corner)		
+		return north_middle,west_middle,south_middle,east_middle
 	end
 end
 
