@@ -98,10 +98,10 @@ class MazeGenerator
 		} 
 
 		#Drill 3 holes on the wall
-		drill_at_vertical(y_north_bound+1,y-1,x)
-		drill_at_vertical(y+1,y_south_bound-1,x)
-		drill_at_horizontal(x_north_bound+1,x-1,y)
-		drill_at_horizontal(x+1,x_south_bound-1,y)
+		#drill_at_vertical(y_north_bound+1,y-1,x)
+		#drill_at_vertical(y+1,y_south_bound-1,x)
+		#drill_at_horizontal(x_north_bound+1,x-1,y)
+		#drill_at_horizontal(x+1,x_south_bound-1,y)
 	end
 	
 	# North Middle
