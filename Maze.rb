@@ -49,12 +49,14 @@ class Maze
 	#recursive division algorithm
 	def redesign()
 		mg=MazeGenerator.new(@x_length,@y_length)
-		@map=mg.generate(Point.new(0,0,'undetected'),Point.new(@y_length-1,@x_length-1,'undetected'))
+		mg.generate(Point.new(0,0,'undetected'),Point.new(@y_length-1,@x_length-1,'undetected'))
+		@map=mg.map
 		
 
 	end
 end
 class MazeGenerator
+	attr_accessor :map
 	def initialize(x_length,y_length)
 		@x_length=x_length
 		@y_length=y_length
@@ -88,10 +90,12 @@ class MazeGenerator
 		y,x=split_point.position
 		y_north_bound,x_north_bound = north_corner.position
 		y_south_bound,x_south_bound = south_corner.position
-		(x_north_bound..x_south_bound).zip(y_north_bound..y_south_bound) { |iter_x,iter_y|
+		(x_north_bound..x_south_bound).each{ |iter_x|
 			@map[y][iter_x].set_wall
-			@map[iter_y][x].set_wall
 		}
+		(y_north_bound..y_south_bound).each { |iter_y|
+			@map[iter_y][x].set_wall
+		} 
 
 		#Drill 3 holes on the wall
 		drill_at_vertical(y_north_bound+1,y-1,x)
@@ -117,11 +121,15 @@ class MazeGenerator
 		end
 		generate_walls(split_point,north_west_corner,south_east_corner)
 	
-		north_middle,west_middle,south_middle,east_middle=middle_points(north_west_corner,south_east_corner,split_point)
-       	       	generate(north_west_corner,split_point)
-		generate(north_middle,east_middle)
-		generate(west_middle,south_middle)
-		generate(split_point,south_east_corner)		
+		#north_middle,west_middle,south_middle,east_middle=middle_points(north_west_corner,south_east_corner,split_point)
+       	       	#generate(north_west_corner,split_point)
+		#generate(north_middle,east_middle)
+		#generate(west_middle,south_middle)
+		#generate(split_point,south_east_corner)
+		point_array=middle_points(north_west_corner,south_east_corner,split_point)	
+		point_array.each_slice(2) {|a|
+			generate(a[0],a[1])
+		}
 	end
 
 	#generate middle points depending on the given 3 points
@@ -134,7 +142,7 @@ class MazeGenerator
 		south_middle=Point.new(s_y,sp_x,'wall')
 		west_middle=Point.new(sp_y,n_x,'wall')
 		east_middle=Point.new(sp_y,s_x,'wall')
-		return north_middle,west_middle,south_middle,east_middle
+		return [north_west_corner,split_point,north_middle,east_middle,west_middle,south_middle,split_point,south_east_corner]
 	end
 end
 

@@ -15,7 +15,7 @@ describe Maze do
 		(@mz.trace(1,1,1,3)).each do |point|
 			puts point.to_str
 		end
-		@mz=Maze.new(5,5)
+		@mz=Maze.new(20,20)
 		@mz.redesign
 		puts ""
 		@mz.display
