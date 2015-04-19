@@ -120,12 +120,6 @@ class MazeGenerator
 			return @map
 		end
 		generate_walls(split_point,north_west_corner,south_east_corner)
-	
-		#north_middle,west_middle,south_middle,east_middle=middle_points(north_west_corner,south_east_corner,split_point)
-       	       	#generate(north_west_corner,split_point)
-		#generate(north_middle,east_middle)
-		#generate(west_middle,south_middle)
-		#generate(split_point,south_east_corner)
 		point_array=middle_points(north_west_corner,south_east_corner,split_point)	
 		point_array.each_slice(2) {|a|
 			generate(a[0],a[1])
