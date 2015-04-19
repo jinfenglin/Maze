@@ -23,37 +23,53 @@ class Maze
 
 		end
 	end
-
+	#Print out the array
 	def display
+		str=map_to_string()
 		(0..@y_length-1).each do |y_counter|
 			(0..@x_length-1).each do |x_counter|
-				pt=@map[y_counter][x_counter]
-				if pt.wall?
-					print '1'
-				else
-					print '0'
-				end 
+				print str[@x_length*y_counter+x_counter]
 			end
-			puts ""
-		end
-		STDOUT.flush
+			print "\n"
+		end		
 	end
-
+	#return 'found' if found solution, otherwise return nil
 	def solve(begy,begx,endy,endx)
 		return @av.solve(begy,begx,endy,endx,@map)
 	end
 
+	#return an array
 	def trace(begx,begy,endy,endx)
-		return @av.trace(begy,begx,endy,endx,@map)
+		point_array=@av.trace(begy,begx,endy,endx,@map)
+		answer=[]
+		point_array.each do |point|
+			answer.push point.to_str
+		end
+		return answer
+
+	end
+	def map_to_string
+		str=""
+		(0..@y_length-1).each do |y_counter|
+			(0..@x_length-1).each do |x_counter|
+				pt=@map[y_counter][x_counter]
+				if pt.wall?
+					str+='1'
+				else
+					str+='0'
+				end 
+			end
+		end
+		return str
 	end
 	#recursive division algorithm
 	def redesign()
 		mg=MazeGenerator.new(@x_length,@y_length)
 		mg.generate(Point.new(0,0,'undetected'),Point.new(@y_length-1,@x_length-1,'undetected'))
 		@map=mg.map
-		
-
+		return map_to_string
 	end
+
 end
 class MazeGenerator
 	attr_accessor :map
@@ -161,6 +177,7 @@ class Advanturer
 		return flag
 	end
 	def trace(begy,begx,endy,endx,map)
+		@trace=[]
 		start_point=map[begy][begx]
 		end_point=map[endy][endx]
 		@map=map
@@ -255,7 +272,7 @@ class Point
 	end
 
 	def to_str()
-		puts "(#{@y},#{@x})"
+		return "(#{@y},#{@x})"
        	end
 
 	def north
